@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Global Disasters Dashboard{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <h1 class="text-3xl font-bold text-white">Global Disasters Dashboard</h1>
+            <p class="text-gray-400 mt-1">Comprehensive disaster statistics and analysis</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Summary Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Total Disasters</div>
+                <div class="text-2xl font-bold text-white mt-1">{{ stats.summary.totalDisasters|number_format }}</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Total Casualties</div>
+                <div class="text-2xl font-bold text-red-400 mt-1">{{ service.formatLargeNumber(stats.summary.totalCasualties) }}</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Economic Loss</div>
+                <div class="text-2xl font-bold text-amber-400 mt-1">{{ service.formatCurrency(stats.summary.totalEconomicLoss) }}</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Total Aid</div>
+                <div class="text-2xl font-bold text-green-400 mt-1">{{ service.formatCurrency(stats.summary.totalAidAmount) }}</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Avg Response</div>
+                <div class="text-2xl font-bold text-blue-400 mt-1">{{ stats.summary.avgResponseTime }}h</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div class="text-gray-400 text-sm uppercase tracking-wide">Avg Recovery</div>
+                <div class="text-2xl font-bold text-purple-400 mt-1">{{ stats.summary.avgRecoveryDays }} days</div>
+            </div>
+        </section>
+
+        <!-- Charts Row 1 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Disasters by Year -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Disasters by Year</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-data-value="{{ stats.disastersByYear|json_encode }}"
+                        data-chart-label-key-value="year"
+                        data-chart-data-key-value="count"
+                        data-chart-label-value="Number of Disasters"
+                        data-chart-color-value="59, 130, 246"
+                    ></canvas>
+                </div>
+            </div>
+
+            <!-- Casualties by Year -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Casualties by Year</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="line"
+                        data-chart-data-value="{{ stats.casualtiesByYear|json_encode }}"
+                        data-chart-label-key-value="year"
+                        data-chart-data-key-value="casualties"
+                        data-chart-label-value="Casualties"
+                        data-chart-color-value="239, 68, 68"
+                    ></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row 2 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Disasters by Type (Pie) -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Disasters by Type</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="doughnut"
+                        data-chart-data-value="{{ stats.disastersByType|json_encode }}"
+                        data-chart-label-key-value="disasterType"
+                        data-chart-data-key-value="count"
+                        data-chart-label-value="Disasters"
+                    ></canvas>
+                </div>
+            </div>
+
+            <!-- Economic Loss by Type -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Avg Economic Loss by Type ($M)</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-data-value="{{ stats.economicLossByType|json_encode }}"
+                        data-chart-label-key-value="disasterType"
+                        data-chart-data-key-value="avgLoss"
+                        data-chart-label-value="Avg Loss (USD)"
+                        data-chart-color-value="251, 191, 36"
+                        data-chart-horizontal-value="true"
+                    ></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row 3 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Top 10 Countries by Disasters -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Top 10 Countries by Disasters</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-data-value="{{ stats.disastersByCountry|json_encode }}"
+                        data-chart-label-key-value="country"
+                        data-chart-data-key-value="count"
+                        data-chart-label-value="Disasters"
+                        data-chart-color-value="139, 92, 246"
+                        data-chart-horizontal-value="true"
+                    ></canvas>
+                </div>
+            </div>
+
+            <!-- Deadliest Countries -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4">Deadliest Countries (Total Casualties)</h2>
+                <div class="h-64">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-data-value="{{ stats.deadliestCountries|json_encode }}"
+                        data-chart-label-key-value="country"
+                        data-chart-data-key-value="totalCasualties"
+                        data-chart-label-value="Casualties"
+                        data-chart-color-value="239, 68, 68"
+                        data-chart-horizontal-value="true"
+                    ></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safest Countries Table -->
+        <section class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-lg font-semibold text-white mb-4">Safest Countries (Lowest Avg Casualties per Disaster)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="pb-3 text-gray-400 font-medium">Rank</th>
+                            <th class="pb-3 text-gray-400 font-medium">Country</th>
+                            <th class="pb-3 text-gray-400 font-medium text-right">Avg Casualties</th>
+                            <th class="pb-3 text-gray-400 font-medium text-right">Disasters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for country in stats.safestCountries %}
+                        <tr class="border-b border-gray-700/50 hover:bg-gray-700/30">
+                            <td class="py-3 text-gray-300">{{ loop.index }}</td>
+                            <td class="py-3 text-white font-medium">{{ country.country }}</td>
+                            <td class="py-3 text-green-400 text-right">{{ country.avgCasualties|number_format(1) }}</td>
+                            <td class="py-3 text-gray-300 text-right">{{ country.disasterCount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-12">
+        <div class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-400">
+            Global Disasters Database &bull; Data visualization powered by Chart.js
+        </div>
+    </footer>
+</div>
+{% endblock %}
