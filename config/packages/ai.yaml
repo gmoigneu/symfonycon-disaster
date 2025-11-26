@@ -1,0 +1,5 @@
+# config/packages/ai.yaml
+ai:
+    platform:
+        anthropic:
+            api_key: '%env(ANTHROPIC_API_KEY)%'
