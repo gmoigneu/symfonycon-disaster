@@ -1,0 +1,30 @@
+# MCP Server Configuration
+mcp:
+    version: '1.0.0'
+    pagination_limit: 100
+    instructions: |
+        This MCP server provides access to a global disasters database containing
+        ~50,000 disaster records from 2018-2024 across 18 countries.
+
+        Available tools:
+        - Statistics tools: Get summary stats, disasters by year/country/type
+        - Search tools: Search by country, type, date range, or severity
+        - Natural language query: Ask questions in plain English
+
+        Disaster types: Earthquake, Hurricane, Tornado, Flood, Wildfire,
+        Drought, Extreme Heat, Storm Surge, Volcanic Eruption, Landslide
+
+        Countries: Australia, Bangladesh, Brazil, Canada, China, France,
+        Germany, Greece, India, Indonesia, Italy, Japan, Mexico, Nigeria,
+        Philippines, South Africa, Spain, USA
+
+    client_transports:
+        stdio: true
+        http: true
+
+    http:
+        path: /mcp
+        session:
+            store: file
+            directory: '%kernel.cache_dir%/mcp-sessions'
+            ttl: 3600

@@ -16,5 +16,10 @@ services:
     App\:
         resource: '../src/'
 
+    # MCP Natural Language Query Tool - inject the API key
+    App\Mcp\Tool\NaturalLanguageQueryTool:
+        arguments:
+            $anthropicApiKey: '%env(ANTHROPIC_API_KEY)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

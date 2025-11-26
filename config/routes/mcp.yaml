@@ -1,0 +1,4 @@
+# MCP Server routes
+mcp_routes:
+    resource: .
+    type: mcp
